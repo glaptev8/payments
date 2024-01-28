@@ -1,0 +1,25 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+  r2dbc:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+  flyway:
+    url: ${FLYWAY_DATASOURCE_URL}
+    user: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+
+integration:
+  user-property:
+    base-url: ${USER_URL}
+  person-property:
+    base-url: ${PERSON_URL}
+    user-info: "userInfo"
+    profile: "profile"
+  payment-provider-property:
+    base-url: ${PAYMENT_PROVIDER_URL}
+    transaction: "transaction"
+    pay-out: "payout"
