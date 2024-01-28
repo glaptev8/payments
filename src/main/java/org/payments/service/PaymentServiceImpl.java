@@ -1,5 +1,7 @@
 package org.payments.service;
 
+import java.util.Map;
+
 import org.leantech.common.dto.Currency;
 import org.leantech.common.dto.ProviderRequestDto;
 import org.leantech.common.dto.ProviderRequestDto.CardData;
@@ -9,6 +11,7 @@ import org.leantech.webclient.client.paymentprovider.PaymentProviderClient;
 import org.leantech.webclient.client.person.PersonClient;
 import org.leantech.webclient.client.user.UserClient;
 import org.payments.dto.PaymentDto;
+import org.payments.dto.PaymentProviderResponse;
 import org.payments.entity.PaymentMethod;
 import org.payments.repository.PaymentMethodDefinitionsRepository;
 import org.payments.repository.PaymentMethodRepository;
@@ -30,7 +33,7 @@ public class PaymentServiceImpl implements PaymentService {
   private final PaymentProviderClient paymentProviderClient;
 
   @Override
-  public Mono<TransactionResponse> payment(PaymentDto paymentDto) {
+  public Mono<PaymentProviderResponse> payment(PaymentDto paymentDto) {
     log.info("paymentdto {}", paymentDto);
     return personClient.userInfo(paymentDto.getEmail())
       .flatMap(userDto -> {
@@ -59,7 +62,24 @@ public class PaymentServiceImpl implements PaymentService {
                   .language(userDto.getLanguage())
                   .build();
                 log.info("providerRequestDto {}", providerRequestDto);
-                return paymentProviderClient.transaction(providerRequestDto);
+                if (paymentDto.getPaymentType().equals("TOP_UP"))
+                  return paymentProviderClient.transaction(providerRequestDto)
+                    .map(transactionResponse -> PaymentProviderResponse.builder()
+                      .id(transactionResponse.getTransactionId())
+                      .type("TOP_UP")
+                      .message(transactionResponse.getMessage())
+                      .transactionStatusType(transactionResponse.getStatus().toString())
+                      .build());
+                else if (paymentDto.getPaymentType().equals("PAY_OUT")) {
+                  return paymentProviderClient.payOut(providerRequestDto)
+                    .map(transactionResponse -> PaymentProviderResponse.builder()
+                      .id(transactionResponse.getPayOutId())
+                      .type("PAY_OUT")
+                      .message(transactionResponse.getMessage())
+                      .transactionStatusType(transactionResponse.getStatus().toString())
+                      .build());
+                }
+                return Mono.empty();
               });
           });
       });

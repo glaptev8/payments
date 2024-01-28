@@ -2,6 +2,7 @@ package org.payments.controller;
 
 import org.leantech.common.dto.TransactionResponse;
 import org.payments.dto.PaymentDto;
+import org.payments.dto.PaymentProviderResponse;
 import org.payments.service.PaymentService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,7 +20,7 @@ public class PaymentController {
   private final PaymentService paymentService;
 
   @PostMapping("/payment")
-  Mono<TransactionResponse> payment(@RequestBody PaymentDto paymentDto) {
+  Mono<PaymentProviderResponse> payment(@RequestBody PaymentDto paymentDto) {
       return paymentService.payment(paymentDto);
   }
 }

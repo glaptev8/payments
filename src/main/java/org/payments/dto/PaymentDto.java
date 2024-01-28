@@ -24,5 +24,6 @@ public class PaymentDto {
   private LocalDate expDate;
   private String cvv;
   private String walletUid;
+  private String paymentType;
   private BigDecimal amount;
 }
